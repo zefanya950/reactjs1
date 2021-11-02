@@ -19,6 +19,8 @@ import PopularMovie from './screens/popularmovie';
 import PopularActor from './screens/popularactor';
 import DetailMovie from './screens/detailmovie';
 import NewPopMovie from './screens/newpopmovie';
+import EditMovie from './screens/editmovie';
+
 
 
 const Stack = createNativeStackNavigator();
@@ -89,7 +91,7 @@ export default class App extends Component {
      
     <NavigationContainer>
       <Drawer.Navigator drawerContent={props => <CustomDrawerContent {...props} />}>
-        <Drawer.Screen name="Dashboard" component={Nav1} options={{ headerShown:false}}  />
+        <Drawer.Screen name="Dashboard" component={Nav1} options={{ headerShown:true}}  />
         <Drawer.Screen name="Add Product" component={AddProduct} />
         <Drawer.Screen name="Setting" component={Setting} />
         <Drawer.Screen name="Quiz" component={Quiz} />
@@ -109,6 +111,7 @@ function NavMovie() {
       <Stack.Screen name="PopularMovie" component={PopularMovie} 
        options={{ headerShown: false }}/>
       <Stack.Screen name="DetailMovie" component={DetailMovie} />
+      <Stack.Screen name="EditMovie" component={EditMovie}  />
     </Stack.Navigator>
   );
 }

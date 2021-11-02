@@ -1,6 +1,9 @@
-import { StyleSheet, View, Text, FlatList,Button,TextInput } from "react-native";
+import { StyleSheet, View, Text, FlatList,Button,TextInput, ScrollView } from "react-native";
 import { Card,Input,Image,Icon,SearchBar } from 'react-native-elements';
 import React from "react";
+import { useNavigation } from "@react-navigation/core";
+
+
 
 class DetailMovie extends React.Component {
     constructor(){
@@ -66,7 +69,7 @@ class DetailMovie extends React.Component {
          return <Text>Waiting JSON..</Text>
        }else
        {
-        return <View>
+        return <View style={{flex: 1}}>
         <Card>
             <Card.Title>{this.state.data.title}</Card.Title>
             <Card.Divider/>
@@ -103,7 +106,14 @@ class DetailMovie extends React.Component {
                 onPress={() =>{this.deleteData()}
                 }
               />
-
+            <Button
+              buttonStyle={{borderRadius: 0, marginLeft: 0, marginRight: 0, marginBottom: 0}}
+              title='Edit'
+              onPress={() =>{
+                const { navigation } = this.props;
+                navigation.navigate("EditMovie",{movie_id: this.state.movie_id })}
+              }
+              />
             </Card>
         </View>
 
@@ -112,4 +122,8 @@ class DetailMovie extends React.Component {
         }
     }
 
-export default DetailMovie;
+    export default function(props) {
+      const navigation = useNavigation();
+      return <DetailMovie {...props} navigation={navigation} />;
+     }
+     
