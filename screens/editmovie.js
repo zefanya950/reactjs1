@@ -26,6 +26,7 @@ export default class EditMovie extends ValidationComponent {
             dd_value:'',
             dd_open:false,
             is_addgenre:false,
+            id_genre:0
             
           }
     }
@@ -148,7 +149,34 @@ showDateTimePicker = () => {
              } catch (error) {
               console.log(error);
              }
-            }   
+            }
+
+            deleteGenre(idgenre){
+              const options = {
+               method: 'POST',
+               headers: new Headers({
+                'Content-Type': 'application/x-www-form-urlencoded'
+               }),
+               body: "genre_id="+idgenre+"&"+
+                  "movie_id="+this.state.movie_id
+              };
+               try {
+                fetch('http://ubaya.fun/react/160418044/deletemoviegenre.php',
+                options)
+                 .then(response => response.json())
+                 .then(resjson =>{
+                  console.log(resjson);
+                  if(resjson.result==='success') alert('sukses')
+                  this.setState(
+                     this.state = {
+                        is_fetched:false,
+                        is_addgenre:false
+                  })
+                 });
+               } catch (error) {
+                console.log(error);
+               }
+              }
   
     
 
@@ -258,7 +286,10 @@ render() {
             data={this.state.genres} 
             keyExtractor={(item) => item.genre_name} 
             renderItem={({item}) => (
-            <View><Text>{item.genre_name}</Text>
+            <View><Text>{item.genre_name}<Button
+            onPress={() => this.deleteGenre(item.genre_id)}
+            title="Delete"
+            /></Text>
             </View>)}
             />
             <DropDownPicker
