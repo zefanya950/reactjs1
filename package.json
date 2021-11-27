@@ -16,6 +16,7 @@
     "@react-navigation/native": "^6.0.2",
     "@react-navigation/native-stack": "^6.1.0",
     "expo": "~42.0.1",
+    "expo-image-picker": "^11.0.3",
     "expo-status-bar": "~1.0.4",
     "react": "16.13.1",
     "react-dom": "16.13.1",
@@ -25,12 +26,14 @@
     "react-native-form-validator": "^0.5.1",
     "react-native-gesture-handler": "~1.10.2",
     "react-native-modal-datetime-picker": "^13.0.0",
+    "react-native-raw-bottom-sheet": "^2.2.0",
     "react-native-reanimated": "~2.2.0",
     "react-native-safe-area-context": "3.2.0",
     "react-native-screens": "~3.4.0",
     "react-native-slider-picker": "^1.1.4",
     "react-native-web": "~0.13.12",
-    "save": "^2.4.0"
+    "save": "^2.4.0",
+    "expo-image-manipulator": "~9.2.2"
   },
   "devDependencies": {
     "@babel/core": "^7.9.0"

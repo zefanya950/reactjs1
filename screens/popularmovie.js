@@ -45,7 +45,7 @@ class PopularMovie extends React.Component {
             <Card>
             <Card.Title>{item.title}</Card.Title>
             <Card.Divider/>
-            <Card.Image source={{uri:'http://placekitten.com/200/150'}}>
+            <Card.Image style={{height:200,width:340}} source={{uri:item.urls}}>
             </Card.Image>
             <Text style={{marginBottom: 10}}>
                  {item.overview}

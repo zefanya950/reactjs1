@@ -1,12 +1,16 @@
 import React, {Component} from 'react';
-import {View, Text, TextInput, StyleSheet,FlatList} from 'react-native';
+import {View,Image, ScrollView, Text, TextInput, TouchableOpacity, StyleSheet,FlatList} from 'react-native';
 import ValidationComponent from 'react-native-form-validator';
-
 import {Card,Icon,Button} from "react-native-elements";
 import DateTimePicker from "react-native-modal-datetime-picker";
 import { SliderPicker } from 'react-native-slider-picker';
 import DropDownPicker from 'react-native-dropdown-picker';
+import { LogBox } from 'react-native';
+import RBSheet from "react-native-raw-bottom-sheet";
+import * as ImagePicker from 'expo-image-picker';
+import { manipulateAsync, SaveFormat } from 'expo-image-manipulator';
 
+LogBox.ignoreLogs(['VirtualizedLists should never be nested inside plain']);
 export default class EditMovie extends ValidationComponent {
     constructor(props){
         super(props);
@@ -23,11 +27,12 @@ export default class EditMovie extends ValidationComponent {
                         {genre_name: 'Horror', genre_id: '2'},
                         {genre_name: 'Family', genre_id: '3'},
                         ],
-            dd_value:'',
+            dd_value:"",
             dd_open:false,
             is_addgenre:false,
-            id_genre:0
-            
+            id_genre:0,
+            _imageUri:"http://ubaya.fun/blank.jpg",
+            _image64:""
           }
     }
 
@@ -107,11 +112,33 @@ showDateTimePicker = () => {
            .then(resjson =>{
             console.log(resjson);
             if(resjson.result==='success') alert('sukses')
+            const data = new FormData();
+          data.append('movie_id', this.state.movie_id);
+          data.append('image', this.state._image64);
+          const options2 = {
+            method: 'POST',
+            headers: new Headers({
+            'Content-Type': 'application/form-data'
+            }),
+            body: data
+          };
+            try {
+            fetch('http://ubaya.fun/react/160418044/uploadposter.php',
+            options2)
+              .then(response => response.json())
+              .then(resjson =>{
+              console.log(resjson);
+              if(resjson.result==='success') alert(resjson.msg)
+              else alert(resjson.msg)
+              });
+            } catch (error) {
+            console.log(error);
+            }
            });
          } catch (error) {
           console.log(error);
          }
-        }
+          }
 
         _onPressButton = () => {
             if(this.validate({
@@ -177,9 +204,51 @@ showDateTimePicker = () => {
                 console.log(error);
                }
               }
-  
-    
 
+              _imgGaleri = async () => {
+                        let result = await ImagePicker.launchImageLibraryAsync({
+                         mediaTypes: ImagePicker.MediaTypeOptions.All,
+                         allowsEditing: true,
+                         aspect: [4, 3],
+                         quality: 1,
+                        });
+                        console.log(result);
+                
+                        if (!result.cancelled) {
+                        //  this.setState(state => ({
+                        //   _imageUri:result.uri
+                        //  }))
+                        this._prosesFoto(result.uri);
+                        }
+                       }
+              _imgKamera = async () => {
+                      let result = await ImagePicker.launchCameraAsync({
+                       mediaTypes: ImagePicker.MediaTypeOptions.Images,
+                       allowsEditing: true,
+                       aspect: [4, 3],
+                       quality: 1,
+                      });
+                      console.log(result);
+                      if (!result.cancelled) {
+                      //  this.setState(state => ({
+                      //   _imageUri:result.uri
+                      //  }))
+                      this._prosesFoto(result.uri);
+                      }
+                     }
+              _prosesFoto = async (uri) => {
+                      const manipResult = await manipulateAsync(
+                       uri,
+                       [
+                        {resize:{height:480,width:360}}
+                       ],
+                       { compress: 1, format: SaveFormat.JPEG, base64:true }
+                      );
+                      this.setState(state => ({
+                        _imageUri:manipResult.uri,
+                        _image64: manipResult.base64
+                       }))
+                     };
     fetchData = () => {
         const options = {
           method: 'POST',
@@ -221,7 +290,7 @@ render() {
         return <Text>Waiting JSON..</Text>
     }else
     {
-        return <View>
+        return <ScrollView>
             <Card>
     <Card.Title>Edit Data Movie</Card.Title>
     <Card.Divider/>
@@ -272,7 +341,45 @@ render() {
           widthPercentage={40}
         />
           </View>
-
+          <TouchableOpacity onPress={() => this.RBSheet.open()}>
+          <Image
+          style={styles.imgPoster}
+          source={{uri: this.state._imageUri}}
+          />
+          </TouchableOpacity>
+          <RBSheet
+     ref={ref => {
+      this.RBSheet = ref;
+     }}
+     height={100}
+     openDuration={250}
+     customStyles={{
+      container: {
+       justifyContent: "center",
+       alignItems: "center"
+      }
+     }}
+    >
+      <View>
+      <Button style={styles.btn}
+      onPress={this._imgKamera}
+      icon={{
+       name: "camera",
+       size: 15,
+       color: "white"
+      }}
+      title="Camera"/>
+     
+      <Button style={styles.btn}
+      onPress={this._imgGaleri}
+      icon={{
+       name: "photo",
+       size: 15,
+       color: "white"
+      }}
+      title="Gallery" />
+     </View>
+   </RBSheet>
                 <Button
             onPress={this._onPressButton}
             title="Submit"
@@ -304,48 +411,56 @@ render() {
                 setValue={this.setValue}
             />
           </Card>
-                </View>
+                </ScrollView>
             }
         }
 }
 
 
 const styles = StyleSheet.create({
-          input: {
-            height: 40,
-            width:'100%',
-            borderWidth: 1,
-            padding: 10,
+       input: {
+        height: 40,
+        width:'100%',
+        borderWidth: 1,
+        padding: 10,
             marginBottom:10
-          },
-          input2: {
-                height: 100,
-                width:'100%',
-                borderWidth: 1,
-                padding: 10,
+       },
+       input2: {
+            height: 100,
+            width:'100%',
+            borderWidth: 1,
+            padding: 10,
                 marginBottom:10
-              },
+           },
           
           warning:{
             color:"#ff0000"
           },
           input3: {
-                    height: 40,
-                    width:'85%',
-                    borderWidth: 1,
-                    padding: 10,
-                  },
+                height: 40,
+                width:'85%',
+                borderWidth: 1,
+                padding: 10,
+               },
             input4: {
-                        height: 40,
-                        width:'15%',
-                        borderWidth: 1,
-                        padding: 10,
-                      },
-          viewRow:{
-             flexDirection:"row",
-             justifyContent:"flex-start",
-             
-             paddingRight:50,
-             marginBottom:10
-          }
-       })
+                    height: 40,
+                    width:'15%',
+                    borderWidth: 1,
+                    padding: 10,
+                   },
+       viewRow:{
+        flexDirection:"row",
+        justifyContent:"flex-start",
+        
+        paddingRight:50,
+        marginBottom:10
+       },
+        imgPoster:{
+          width:'100%',
+          height:400
+        },
+        btn:{
+          marginLeft:20,
+          marginRight:20
+        }
+     })
